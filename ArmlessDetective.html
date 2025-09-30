@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Suspect Filter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      padding: 20px;
+    }
+    h1 {
+      color: #FFD700;
+    }
+    .filters {
+      margin-bottom: 20px;
+    }
+    .trait-checkbox {
+      margin-right: 15px;
+      margin-bottom: 10px;
+      display: inline-block;
+      cursor: pointer;
+      user-select: none;
+    }
+    .trait-checkbox span {
+      font-size: 16px;
+    }
+    .buttons {
+      margin-top: 10px;
+    }
+    .suspect {
+      border: 1px solid #444;
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #222;
+    }
+    .suspect h3 {
+      margin: 0 0 5px;
+    }
+    button {
+      background-color: #444;
+      color: #eee;
+      border: none;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Suspect Filter Interface</h1>
+
+  <div class="filters">
+    <h3>Click to Cycle: 🔲 → ✅ → ❌ → 🔲</h3>
+    <div id="trait-filters"></div>
+    <div class="buttons">
+      <button onclick="clearFilters()">🧼 Clear All</button>
+    </div>
+  </div>
+
+  <div id="suspect-list"></div>
+
+  <script>
+    // <-- PASTE YOUR JSON DATA BETWEEN THESE BACKTICKS -->
+    const suspects = JSON.parse(`[
+  {
+    "id": 1,
+    "name": "Charles",
+    "gender": "Male",
+    "hairColor": "Maroon",
+    "notes": [
+      "Writes in their diary",
+      "Sheds hair oftenly",
+      "Likes to clean"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 2,
+    "name": "Nancy",
+    "gender": "Female",
+    "hairColor": "Burlap",
+    "notes": [
+      "Has no Robux",
+      "Writes in their diary",
+      "Likes to clean"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 3,
+    "name": "Oliver",
+    "gender": "Male",
+    "hairColor": "Really black",
+    "notes": [
+      "Has no Robux",
+      "Writes in their diary",
+      "Cold-blooded"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 4,
+    "name": "Clara",
+    "gender": "Female",
+    "hairColor": "Cork",
+    "notes": [
+      "Bad at hiding their fingerprints",
+      "Cold-blooded",
+      "Has no Robux"
+    ],
+    "extraInfo": "Sold all of her teeth to the tooth fairy when she was young, now all of her new ones grew in wrong."
+  },
+  {
+    "id": 5,
+    "name": "Sophia",
+    "gender": "Female",
+    "hairColor": "Teal",
+    "notes": [
+      "Eats lots of food",
+      "Sheds hair oftenly",
+      "Bad at hiding their fingerprints"
+    ],
+    "extraInfo": "REALLY LIKES CATS"
+  },
+  {
+    "id": 6,
+    "name": "Trey",
+    "gender": "Female",
+    "hairColor": "Bright orange",
+    "notes": [
+      "Eats lots of food",
+      "Cold-blooded",
+      "Has no Robux"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 7,
+    "name": "Junior",
+    "gender": "Male",
+    "hairColor": "Burgundy",
+    "notes": [
+      "Sheds hair oftenly",
+      "Cold-blooded",
+      "Has no Robux"
+    ],
+    "extraInfo": "Don't let his size fool you - he's actually very old."
+  },
+  {
+    "id": 8,
+    "name": "Buck",
+    "gender": "Male",
+    "hairColor": "Really black",
+    "notes": [
+      "Writes in their diary",
+      "Eats lots of food",
+      "Bad at hiding their fingerprints"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 9,
+    "name": "Donald",
+    "gender": "Male",
+    "hairColor": "Really black",
+    "notes": [
+      "Likes to clean",
+      "Eats lots of food",
+      "Bad at hiding their fingerprints"
+    ],
+    "extraInfo": "Don't let his friendly face fool you. He owns many evil banana farms."
+  },
+  {
+    "id": 10,
+    "name": "Susan",
+    "gender": "Female",
+    "hairColor": "Dark orange",
+    "notes": [
+      "Sheds hair oftenly",
+      "Bad at hiding their fingerprints",
+      "Cold-blooded"
+    ],
+    "extraInfo": "The hair color is natural."
+  },
+  {
+    "id": 11,
+    "name": "Betty",
+    "gender": "Female",
+    "hairColor": "Dark indigo",
+    "notes": [
+      "Likes to clean",
+      "Sheds hair oftenly",
+      "Has no Robux"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 12,
+    "name": "Thomas",
+    "gender": "Male",
+    "hairColor": "Really black",
+    "notes": [
+      "Likes to clean",
+      "Eats lots of food",
+      "Cold-blooded"
+    ],
+    "extraInfo": "Yes, he is a nerd, bookworm, maybe even studious!"
+  },
+  {
+    "id": 13,
+    "name": "David",
+    "gender": "Male",
+    "hairColor": "Bright red",
+    "notes": [
+      "Likes to clean",
+      "Sheds hair oftenly",
+      "Cold-blooded"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 14,
+    "name": "Linda",
+    "gender": "Female",
+    "hairColor": "Really black",
+    "notes": [
+      "Writes in their diary",
+      "Bad at hiding their fingerprints",
+      "Cold-blooded"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 15,
+    "name": "Mary",
+    "gender": "Female",
+    "hairColor": "Really black",
+    "notes": [
+      "Writes in their diary",
+      "Eats lots of food",
+      "Cold-blooded"
+    ],
+    "extraInfo": "Feeling blue? she wishes she was blue."
+  },
+  {
+    "id": 16,
+    "name": "James",
+    "gender": "Male",
+    "hairColor": "Light grey",
+    "notes": [
+      "Writes in their diary",
+      "Sheds hair oftenly",
+      "Cold-blooded"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 17,
+    "name": "Matthew",
+    "gender": "Male",
+    "hairColor": "Forest green",
+    "notes": [
+      "Writes in their diary",
+      "Sheds hair oftenly",
+      "Has no Robux"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 18,
+    "name": "Kyle",
+    "gender": "Male",
+    "hairColor": "Really black",
+    "notes": [
+      "Eats lots of food",
+      "Bad at hiding their fingerprints",
+      "Cold-blooded"
+    ],
+    "extraInfo": "Outdated picture; lost his hair in a tragic banana-picking accident."
+  },
+  {
+    "id": 19,
+    "name": "Herbert",
+    "gender": "Male",
+    "hairColor": "Cocoa",
+    "notes": [
+      "Likes to clean",
+      "Sheds hair oftenly",
+      "Bad at hiding their fingerprints"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 20,
+    "name": "Rebecca",
+    "gender": "Female",
+    "hairColor": "Really black",
+    "notes": [
+      "Writes in their diary",
+      "Bad at hiding their fingerprints",
+      "Has no Robux"
+    ],
+    "extraInfo": "Really wishes she wasn't here, but she couldve been there..."
+  },
+  {
+    "id": 21,
+    "name": "Sara",
+    "gender": "Female",
+    "hairColor": "Really black",
+    "notes": [
+      "Likes to clean",
+      "Bad at hiding their fingerprints",
+      "Has no Robux"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 22,
+    "name": "Bob",
+    "gender": "Male",
+    "hairColor": "Really black",
+    "notes": [
+      "Likes to clean",
+      "Eats lots of food",
+      "Has no Robux"
+    ],
+    "extraInfo": "Wears the clothes he wears because they are comfortable to him, not because he is homeless."
+  },
+  {
+    "id": 23,
+    "name": "Jimbo",
+    "gender": "Male",
+    "hairColor": "Really black",
+    "notes": [
+      "Writes in their diary",
+      "Eats lots of food",
+      "Has no Robux"
+    ],
+    "extraInfo": "None"
+  },
+  {
+    "id": 24,
+    "name": "William",
+    "gender": "Male",
+    "hairColor": "Parsley green",
+    "notes": [
+      "Likes to clean",
+      "Eats lots of food",
+      "Sheds hair oftenly"
+    ],
+    "extraInfo": "Mentally deranged."
+  }
+]`);
+
+    const allTraits = [...new Set(suspects.flatMap(s => s.notes))].sort();
+    const traitStates = {}; // trait -> 'include' | 'exclude' | undefined
+
+    const traitContainer = document.getElementById('trait-filters');
+    const suspectList = document.getElementById('suspect-list');
+
+    function createTraitCheckbox(trait) {
+      const label = document.createElement('label');
+      label.className = 'trait-checkbox';
+      label.dataset.trait = trait;
+
+      const emoji = document.createElement('span');
+      emoji.textContent = '🔲';
+
+      const text = document.createElement('span');
+      text.textContent = ` ${trait}`;
+
+      label.appendChild(emoji);
+      label.appendChild(text);
+      traitContainer.appendChild(label);
+
+      label.addEventListener('click', () => {
+        const current = traitStates[trait];
+
+        if (!current) {
+          traitStates[trait] = 'include';
+          emoji.textContent = '✅';
+        } else if (current === 'include') {
+          traitStates[trait] = 'exclude';
+          emoji.textContent = '❌';
+        } else {
+          delete traitStates[trait];
+          emoji.textContent = '🔲';
+        }
+
+        renderSuspects();
+      });
+    }
+
+    function clearFilters() {
+      Object.keys(traitStates).forEach(trait => delete traitStates[trait]);
+
+      document.querySelectorAll('.trait-checkbox span:first-child').forEach(emoji => {
+        emoji.textContent = '🔲';
+      });
+
+      renderSuspects();
+    }
+
+    function renderSuspects() {
+      const includeTraits = Object.entries(traitStates)
+        .filter(([_, state]) => state === 'include')
+        .map(([trait]) => trait);
+
+      const excludeTraits = Object.entries(traitStates)
+        .filter(([_, state]) => state === 'exclude')
+        .map(([trait]) => trait);
+
+      suspectList.innerHTML = '';
+
+      const filtered = suspects.filter(suspect => {
+        // must include all included traits
+        if (!includeTraits.every(trait => suspect.notes.includes(trait))) return false;
+        // must NOT have any excluded traits
+        if (excludeTraits.some(trait => suspect.notes.includes(trait))) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        suspectList.innerHTML = '<p>No matching suspects.</p>';
+        return;
+      }
+
+      filtered.forEach(suspect => {
+        const div = document.createElement('div');
+        div.className = 'suspect';
+        div.innerHTML = `
+          <h3>${suspect.id}. ${suspect.name}</h3>
+          <p><strong>Gender:</strong> ${suspect.gender}</p>
+          <p><strong>Hair Color:</strong> ${suspect.hairColor}</p>
+          <p><strong>Traits:</strong> ${suspect.notes.join(', ')}</p>
+          ${suspect.extraInfo && suspect.extraInfo !== "None" ? `<p><strong>Extra:</strong> ${suspect.extraInfo}</p>` : ''}
+        `;
+        suspectList.appendChild(div);
+      });
+    }
+
+    // Create trait checkboxes
+    allTraits.forEach(createTraitCheckbox);
+
+    // Initial render
+    renderSuspects();
+  </script>
+</body>
+</html>
